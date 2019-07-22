@@ -5,25 +5,37 @@
 
 ## Install (No Docker)
 - Navigate to folder
+- config.config file with the following code inside
+```
+db-url=URL1:PORT1,URL2:PORT2,...
+db-username=INSERT PORT HERE
+db-password=INSERT PASSWORD HERE
+```
 - mvn clean install
 - mvn dependency:resolve
 - mvn verify
-- java -jar ./target/jdbc-rmi-server-0.1.0-SNAPSHOT-jar-with-dependencies.jar
+- java -jar ./target/rmi-server.jar
 
-*Note: Will listen on port 4567*
+*Note: Will listen on port 7654*
 
 ## Requirements (Docker)
 - Docker
 
 ## Install (Docker)
 - Navigate to folder
+- config.config file with the following code inside
+```
+db-url=URL1:PORT1,URL2:PORT2,...
+db-username=INSERT PORT HERE
+db-password=INSERT PASSWORD HERE
+```
 - docker build -t rmi-server .
-- docker run -p 5000:4567 rmi-server
+- docker run -p 7654:7654 rmi-server
 
-*Note: Will listen on port 5000*
+*Note: Will listen on port 7654*
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
-MIT © [Breno Salles](brenosalles.com)
+## Author
+[Breno Salles](brenosalles.com)

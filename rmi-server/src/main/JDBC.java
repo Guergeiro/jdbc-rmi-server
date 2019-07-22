@@ -382,14 +382,18 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
     JSONObject obj = new JSONObject();
     Integer count = 0;
     try {
-      // Open a connection
+      // STEP 2: Register JDBC driver
+      Class.forName(JDBC_DRIVER);
+
+      // STEP 3: Open a connection
       System.out.println("Connecting to a selected database...");
       conn = DriverManager.getConnection(DB_URL, USER, PASS);
       System.out.println("Connected database successfully...");
 
-      // Execute a query
+      // STEP 4: Execute a query
       System.out.println("Creating statement...");
       stmt = conn.createStatement();
+
       String sql = "UPDATE Users " + "SET nome = '" + user.getNome() + "', localidade = '"
           + user.getLocalidade() + "', data = '" + user.getData_nascimento().toString()
           + "' WHERE id = " + id;

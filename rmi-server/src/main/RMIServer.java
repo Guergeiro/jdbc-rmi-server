@@ -40,7 +40,6 @@ public class RMIServer {
       }
     }
 
-
     try {
       JDBCInterface jdbc = new JDBC(prop.getProperty("db-url"), prop.getProperty("db-username"),
           prop.getProperty("db-password"));
