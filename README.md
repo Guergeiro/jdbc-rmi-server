@@ -38,4 +38,4 @@ db-password=INSERT PASSWORD HERE
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Author
-[Breno Salles](brenosalles.com)
+[Breno Salles](https://brenosalles.com)
