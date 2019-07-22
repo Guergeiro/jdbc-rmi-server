@@ -182,11 +182,13 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
     return obj;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public String deleteUser(Integer id) throws RemoteException {
+  public JSONObject deleteUser(Integer id) throws RemoteException {
     Connection conn = null;
     Statement stmt = null;
     Integer count = 0;
+    JSONObject obj = new JSONObject();
 
     try {
       // STEP 2: Register JDBC driver
@@ -212,7 +214,8 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
 
     } catch (Exception e) {
       e.printStackTrace();
-      return returnJSONMessage("Database Error.");
+      obj.put("message", "Database Error.");
+      return obj;
     } finally {
       // finally block used to close resources
       try {
@@ -229,17 +232,18 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
     } // end try
     System.out.println("Goodbye!");
 
-    // Removes from cache
-    users.remove(id);
-
     if (count == 0)
       return null;
-    return returnJSONMessage("Delete Succesful.");
+
+    // Removes from cache
+    users.remove(id);
+    obj.put("message", "Delete Successful.");
+    return obj;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public String selectAllUsers() throws RemoteException {
+  public JSONArray selectAllUsers() throws RemoteException {
     JSONArray array = new JSONArray();
     Connection conn = null;
     Statement stmt = null;
@@ -268,7 +272,7 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
         obj.put("localidade", rs.getString("localidade"));
         obj.put("datanascimento", rs.getDate("data").toString());
         array.add(obj);
-        
+
         // Adds to cache
         users.put(rs.getInt("id"), new User(rs.getString("nome"), rs.getDate("data").toLocalDate(),
             rs.getString("localidade")));
@@ -277,7 +281,7 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
 
     } catch (Exception e) {
       e.printStackTrace();
-      return returnJSONMessage("Database Error.");
+      return null;
     } finally {
       // finally block used to close resources
       try {
@@ -293,12 +297,12 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
       } // end finally try
     } // end try
     System.out.println("Goodbye!");
-    return array.toJSONString();
+    return array;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public String selectUser(Integer id) throws RemoteException {
+  public JSONObject selectUser(Integer id) throws RemoteException {
     JSONObject obj = new JSONObject();
     User user = users.get(id);
     // Checks cache for user
@@ -307,7 +311,7 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
       obj.put("nome", user.getNome());
       obj.put("localidade", user.getLocalidade());
       obj.put("datanascimento", user.getData_nascimento().toString());
-      return obj.toJSONString();
+      return obj;
     } else {
       Connection conn = null;
       Statement stmt = null;
@@ -338,16 +342,17 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
           obj.put("localidade", rs.getString("localidade"));
           obj.put("datanascimento", rs.getDate("data").toString());
           count++;
-          
+
           // Adds to cache
-          users.put(rs.getInt("id"), new User(rs.getString("nome"), rs.getDate("data").toLocalDate(),
-              rs.getString("localidade")));
+          users.put(rs.getInt("id"), new User(rs.getString("nome"),
+              rs.getDate("data").toLocalDate(), rs.getString("localidade")));
         }
         rs.close();
 
       } catch (Exception e) {
         e.printStackTrace();
-        return returnJSONMessage("Database Error.");
+        obj.put("message", "Database Error.");
+        return obj;
       } finally {
         // finally block used to close resources
         try {
@@ -365,27 +370,24 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
       System.out.println("Goodbye!");
       if (count == 0)
         return null;
-      return obj.toJSONString();
+      return obj;
     }
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public String updateUser(Integer id, User user) throws RemoteException {
+  public JSONObject updateUser(Integer id, User user) throws RemoteException {
     Connection conn = null;
     Statement stmt = null;
     JSONObject obj = new JSONObject();
     Integer count = 0;
     try {
-      // STEP 2: Register JDBC driver
-      Class.forName(JDBC_DRIVER);
-
-      // STEP 3: Open a connection
+      // Open a connection
       System.out.println("Connecting to a selected database...");
       conn = DriverManager.getConnection(DB_URL, USER, PASS);
       System.out.println("Connected database successfully...");
 
-      // STEP 4: Execute a query
+      // Execute a query
       System.out.println("Creating statement...");
       stmt = conn.createStatement();
       String sql = "UPDATE Users " + "SET nome = '" + user.getNome() + "', localidade = '"
@@ -398,7 +400,7 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
       sql = "SELECT * FROM Users WHERE id = " + id;
       ResultSet rs = stmt.executeQuery(sql);
 
-      // STEP 5: Extract data from result set
+      // Extract data from result set
       while (rs.next()) {
         // Retrieve by column name
         obj.put("id", String.valueOf(rs.getInt("id")));
@@ -430,18 +432,11 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
     } // end try
     System.out.println("Goodbye!");
 
-    // Removes from cache
-    users.remove(id);
-
     if (count == 0)
       return null;
-    return obj.toJSONString();
-  }
 
-  @SuppressWarnings("unchecked")
-  private static String returnJSONMessage(String message) {
-    JSONObject obj = new JSONObject();
-    obj.put("message", message);
-    return obj.toJSONString();
+    // Removes from cache
+    users.remove(id);
+    return obj;
   }
 }
