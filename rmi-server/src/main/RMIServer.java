@@ -48,6 +48,5 @@ public class RMIServer {
     } catch (Exception e) {
       System.out.println("RMIServer server main " + e.getMessage());
     }
-
   }
 }
