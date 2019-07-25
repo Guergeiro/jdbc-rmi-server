@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 import java.util.Properties;
+import databases.Database;
 
 public class RMIServer {
   public static void main(String args[]) {
@@ -40,9 +42,18 @@ public class RMIServer {
       }
     }
 
+    // Get number of DBs
+    Integer nDBS = Integer.parseInt(prop.getProperty("number-dbs"));
+
+    ArrayList<Database> DBS = new ArrayList<>();
+
+    for (int i = 1; i <= nDBS; i++) {
+      DBS.add(new Database("jdbc:mysql://" + prop.getProperty("db-url" + i),
+          prop.getProperty("db-user" + i), prop.getProperty("db-pass" + i)));
+    }
+
     try {
-      JDBCInterface jdbc = new JDBC(prop.getProperty("db-url"), prop.getProperty("db-username"),
-          prop.getProperty("db-password"));
+      JDBCInterface jdbc = new JDBC(DBS);
       r.rebind("rmi-server", jdbc);
       System.out.println("RMIServer server ready");
     } catch (Exception e) {

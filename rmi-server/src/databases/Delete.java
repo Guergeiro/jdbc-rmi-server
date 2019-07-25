@@ -1,4 +1,4 @@
-package database;
+package databases;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,17 +12,13 @@ public class Delete implements Callable<Object> {
 
   // JDBC driver name and database URL
   private final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-  private String DB_URL;
 
-  // Database credentials
-  private String USER;
-  private String PASS;
+  // Database
+  private Database DB;
 
-  public Delete(String query, String DB_URL, String USER, String PASS) {
+  public Delete(String query, Database DB) {
     this.query = query;
-    this.DB_URL = DB_URL;
-    this.USER = USER;
-    this.PASS = PASS;
+    this.DB = DB;
   }
 
   @Override
@@ -38,7 +34,7 @@ public class Delete implements Callable<Object> {
 
     // Open a connection
     System.out.println("Connecting to a selected database...");
-    Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+    Connection conn = DriverManager.getConnection(DB.getURL(), DB.getUSER(), DB.getPASS());
     System.out.println("Connected database successfully...");
 
     // STEP 4: Execute a query
@@ -56,42 +52,5 @@ public class Delete implements Callable<Object> {
 
     System.out.println("Goodbye!");
     return rows;
-  }
-
-  // Get & Set
-  public String getQuery() {
-    return query;
-  }
-
-  public void setQuery(String query) {
-    this.query = query;
-  }
-
-  public String getDB_URL() {
-    return DB_URL;
-  }
-
-  public void setDB_URL(String dB_URL) {
-    DB_URL = dB_URL;
-  }
-
-  public String getUSER() {
-    return USER;
-  }
-
-  public void setUSER(String uSER) {
-    USER = uSER;
-  }
-
-  public String getPASS() {
-    return PASS;
-  }
-
-  public void setPASS(String pASS) {
-    PASS = pASS;
-  }
-
-  public String getJDBC_DRIVER() {
-    return JDBC_DRIVER;
   }
 }
