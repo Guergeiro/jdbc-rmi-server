@@ -56,7 +56,7 @@ public class Select implements Callable<Object> {
       // Retrieve by column name
       object.put("id", rs.getInt("id"));
       object.put("nome", rs.getString("nome"));
-      object.put("datanascimento", rs.getDate("datanascimento").toString());
+      object.put("datanascimento", rs.getDate("data").toString());
       object.put("localidade", rs.getString("localidade"));
     } else {
       object = null;

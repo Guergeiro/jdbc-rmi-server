@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 import databases.Database;
 import databases.Delete;
 import databases.Insert;
+import databases.Select;
 import databases.SelectAll;
 import databases.Type;
 import databases.Update;
@@ -122,17 +123,6 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
       return new ResponseObject(500, obj);
     }
 
-    // Adds to cache
-    for (int i = 0; i < array.size(); i++) {
-      JSONObject user = (JSONObject) array.get(i);
-      Integer id = (Integer) user.get("id");
-      User u = users.get(id);
-      if (u == null) {
-        users.put(id, new User((String) user.get("nome"),
-            LocalDate.parse((String) user.get("datanascimento")), (String) user.get("localidade")));
-      }
-    }
-
     return new ResponseObject(200, array);
   }
 
@@ -152,7 +142,7 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
     }
 
     String query = "SELECT * FROM Users WHERE id = " + id;
-    SelectAll select = new SelectAll(query, Type.USER, randomDB());
+    Select select = new Select(query, Type.USER, randomDB());
 
     FutureTask<Object> task = new FutureTask<Object>(select);
     Thread t = new Thread(task);
@@ -172,6 +162,10 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
       obj.put("message", "Key doesn't exist.");
       return new ResponseObject(404, obj);
     }
+
+    // Adds to cache
+    users.put(id, new User((String) obj.get("nome"),
+        LocalDate.parse((String) obj.get("datanascimento")), (String) obj.get("localidade")));
 
     return new ResponseObject(200, obj);
   }
@@ -295,17 +289,6 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
       return new ResponseObject(500, obj);
     }
 
-    // Adds to cache
-    for (int i = 0; i < array.size(); i++) {
-      JSONObject message = (JSONObject) array.get(i);
-      Integer id = (Integer) message.get("id");
-      Message m = messages.get(id);
-      if (m == null) {
-        messages.put(id, new Message((String) message.get("message"),
-            Timestamp.valueOf((String) message.get("date"))));
-      }
-    }
-
     return new ResponseObject(200, array);
   }
 
@@ -324,7 +307,7 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
     }
 
     String query = "SELECT * FROM Messages WHERE id = " + id;
-    SelectAll select = new SelectAll(query, Type.MESSAGE, randomDB());
+    Select select = new Select(query, Type.MESSAGE, randomDB());
 
     FutureTask<Object> task = new FutureTask<Object>(select);
     Thread t = new Thread(task);
@@ -344,6 +327,10 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
       obj.put("message", "Key doesn't exist.");
       return new ResponseObject(404, obj);
     }
+
+    // Adds to cache
+    messages.put(id,
+        new Message((String) obj.get("message"), Timestamp.valueOf((String) obj.get("date"))));
 
     return new ResponseObject(200, obj);
   }
@@ -386,14 +373,5 @@ public class JDBC extends UnicastRemoteObject implements JDBCInterface {
   // Get random db
   private Database randomDB() {
     return DBS.get((int) (DBS.size() * Math.random()));
-  }
-
-  // Get & Set
-  public ArrayList<Database> getDBS() {
-    return DBS;
-  }
-
-  public void setDBS(ArrayList<Database> dBS) {
-    DBS = dBS;
   }
 }
